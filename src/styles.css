@@ -250,6 +250,7 @@ code {
 .right {
   display: inline-block;
   margin-right: 1em;
+  color: wheat;
 }
 .right1 {
   position: absolute;
@@ -261,6 +262,7 @@ code {
 .left {
   display: inline-block;
   margin-left: 1em;
+  color: wheat;
 }
 .left1 {
   position: absolute;
@@ -336,6 +338,7 @@ code {
   .checkout-price{
     font-size: xx-large;
   }
+
 }
 
 @media screen and (max-width: 767px) {
@@ -372,5 +375,8 @@ code {
   .centerPass {
     justify-content: center;
     display: flex;
+  }
+  .buttonwidth {
+    width: 70%;
   }
 }
