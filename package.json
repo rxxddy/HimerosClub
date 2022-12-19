@@ -1,0 +1,42 @@
+{
+  "name": "stripe-checkout-client-only",
+  "version": "1.0.0",
+  "description": "Create a checkout session without backend",
+  "keywords": [],
+  "main": "src/index.js",
+  "dependencies": {
+    "@stripe/stripe-js": "1.21.2",
+    "framer-motion": "^7.10.2",
+    "framer-motion-3d": "^7.10.2",
+    "gsap": "^3.11.3",
+    "is_js": "^0.9.0",
+    "is-mobile": "^3.1.1",
+    "react": "17.0.2",
+    "react-cookie-consent": "^8.0.1",
+    "react-dom": "17.0.2",
+    "react-gsap": "^3.2.1",
+    "react-helmet": "^6.1.0",
+    "react-router-dom": "6.0.2",
+    "react-scripts": "4.0.0",
+    "react-use": "^17.4.0",
+    "styled-components": "^5.3.6"
+  },
+  "devDependencies": {
+    "@babel/runtime": "7.13.8",
+    "grunt-contrib-cssmin": "^4.0.0",
+    "grunt-uncss": "^0.10.1",
+    "typescript": "4.0.3"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
+}
