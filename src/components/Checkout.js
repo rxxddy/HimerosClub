@@ -2,9 +2,10 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { useIntersection } from "react-use"; // Нужен для старых анимаций
+import { useIntersection } from "react-use"; 
 import gsap from "gsap";
 import { Title } from "../styles/style";
+import { loadStripe } from "@stripe/stripe-js";
 
 // Images
 import ticket from "../images/ticket.png";
@@ -19,8 +20,12 @@ import fashion from "../images/fashion.png";
 // Styles
 import "../styles/styles.css";
 
-// --- NEW COMPACT STYLES (Styled Components) ---
 
+// --- OPTIMIZATION 1: STRIPE OUTSIDE COMPONENT ---
+const stripePromise = loadStripe("pk_test_51M0hAMK1PrYKJW73EuY6xenNHSTLuRoFN7CTDih18CE5swdGip9mrwXgaMwM7KX9tv0rXz3YX2ItlpI4kggZMsEi00ckAanGkb");
+
+
+// --- STYLED COMPONENTS ---
 const Wrapper = styled.div`
   width: 100%;
   overflow-x: hidden;
@@ -29,13 +34,12 @@ const Wrapper = styled.div`
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 `;
 
-// 1. COMPACT NAVBAR
 const NavContainer = styled.nav`
   display: flex;
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  max-width: 1200px; /* Ограничил ширину для ноутов */
+  max-width: 1200px;
   margin: 0 auto;
   padding: 15px 20px;
   box-sizing: border-box;
@@ -74,13 +78,12 @@ const NavDisabled = styled.span`
 `;
 
 const Logo = styled.img`
-  height: 35px; /* Уменьшил лого */
+  height: 35px;
   object-fit: contain;
 `;
 
-// 2. RESPONSIVE HERO
 const HeroSection = styled.section`
-  min-height: 85vh; /* Чуть меньше экрана */
+  min-height: 85vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -91,7 +94,6 @@ const HeroSection = styled.section`
 `;
 
 const HeroTitle = styled(motion.h1)`
-  /* Шрифт уменьшен для ноутов: от 3rem до 7rem (было 11rem) */
   font-size: clamp(3rem, 7vw, 7rem); 
   font-weight: 900;
   line-height: 0.95;
@@ -117,7 +119,7 @@ const HeroBg = styled.img`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 70%; /* Уменьшил фон */
+  width: 70%;
   max-width: 500px;
   opacity: 0.4;
   z-index: 1;
@@ -144,7 +146,6 @@ const BuyButton = styled.button`
   &:hover { transform: scale(1.05); }
 `;
 
-// 3. CHECKOUT CARD (GLASS) - FIXED BUTTONS
 const CheckoutSection = styled.div`
   padding: 80px 20px;
   display: flex;
@@ -158,7 +159,7 @@ const CheckoutCard = styled(motion.div)`
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 24px;
   padding: 40px;
-  max-width: 900px; /* Компактнее */
+  max-width: 900px;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -175,7 +176,7 @@ const CheckoutCard = styled(motion.div)`
 
 const TicketImage = styled.img`
   width: 100%;
-  max-width: 280px; /* Картинка билета меньше */
+  max-width: 280px;
   transform: rotate(-5deg);
   filter: drop-shadow(0 15px 20px rgba(0,0,0,0.5));
   transition: 0.5s ease;
@@ -191,7 +192,7 @@ const PassInfo = styled.div`
 `;
 
 const PriceTag = styled.div`
-  font-size: 3rem; /* Ценник чуть меньше */
+  font-size: 3rem;
   font-weight: 800;
   color: #fff;
 `;
@@ -209,7 +210,6 @@ const Counter = styled.div`
     height: 35px;
     border-radius: 50%;
     border: none;
-    /* ИСПРАВЛЕНИЕ: Кнопки теперь видно всегда */
     background: #eee; 
     color: #bf2d06;
     font-size: 1.2rem;
@@ -240,27 +240,40 @@ const Counter = styled.div`
   }
 `;
 
-const DisabledButton = styled.button`
-  background: #2a2a2a;
-  color: #666;
-  border: 1px solid #333;
+const PayButton = styled.button`
+  background: linear-gradient(135deg, #bf2d06 0%, #d9381e 100%);
+  color: white;
+  border: none;
   padding: 15px 50px;
   border-radius: 50px;
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: 1.2rem;
+  font-weight: 800;
   letter-spacing: 2px;
   text-transform: uppercase;
-  cursor: not-allowed;
+  cursor: pointer;
   margin-top: 10px;
+  transition: 0.3s;
+  box-shadow: 0 10px 20px rgba(191, 45, 6, 0.3);
+
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 15px 30px rgba(191, 45, 6, 0.5);
+  }
+  
+  &:disabled {
+    opacity: 0.7;
+    cursor: wait;
+    transform: scale(1);
+  }
 `;
 
-// --- TIMER STYLES (Simple) ---
 const TimerWrapper = styled.div`
   display: flex;
   gap: 10px;
   justify-content: center;
   margin-top: 10px;
 `;
+
 const TimerDigit = styled.div`
     font-family: 'Courier New', monospace;
     font-size: 2rem;
@@ -273,11 +286,13 @@ const TimerDigit = styled.div`
 
 const Checkout = () => {
   
-  // --- LOGIC: TIMER ---
+  // Timer
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+  
   useEffect(() => {
     const nextYear = new Date().getFullYear() + 1;
     const deadline = new Date(`January 1, ${nextYear} 00:00:00`).getTime();
+    
     const timer = setInterval(() => {
       const now = new Date().getTime();
       const dist = deadline - now;
@@ -293,18 +308,19 @@ const Checkout = () => {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
+
   const f = (n) => (n < 10 ? `0${n}` : n);
 
-  // --- LOGIC: PARALLAX TEXT ---
+  // Parallax
   const { scrollYProgress } = useScroll();
   const x = useTransform(scrollYProgress, [0, 1], [-200, 200]);
 
-  // --- LOGIC: COUNTER ---
+  // Counter
   const [num, setNum] = useState(1);
   const inc = () => setNum(n => (n < 99 ? n + 1 : n));
   const dec = () => setNum(n => (n > 1 ? n - 1 : n));
 
-  // --- LOGIC: SCROLL ANIMATIONS (ORIGINAL) ---
+  // Animations
   const sectionRef = useRef(null);
   const intersection = useIntersection(sectionRef, { root: null, rootMargin: "0px", threshold: 0.4 });
   const fadeIn = element => { gsap.to(element, { duration: 1, opacity: 1, y: 0, ease: "power4.out", stagger: 0.3 }); };
@@ -325,10 +341,31 @@ const Checkout = () => {
     else fadeIn2(".fadeIn2");
   }, [intersection2]);
 
-  // Scroll Ref
   const checkoutRef = useRef(null);
   const scrollToCheckout = () => {
     checkoutRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  // --- STRIPE LOGIC (COMPONENT PART) ---
+  const [isLoading, setLoading] = useState(false);
+
+  const handleCheckout = async () => {
+    setLoading(true);
+    const stripe = await stripePromise;
+    
+    const { error } = await stripe.redirectToCheckout({
+      lineItems: [{ 
+        price: "price_1MFZJ5K1PrYKJW736SkLpbx4", 
+        quantity: num 
+      }],
+      mode: "subscription",
+      successUrl: `${window.location.origin}/success`,
+      cancelUrl: `${window.location.origin}/cancel`,
+      shippingAddressCollection: { allowedCountries: ['IT'] },
+    });
+
+    if (error) console.error("Stripe Error:", error);
+    setLoading(false);
   };
 
   return (
@@ -376,10 +413,10 @@ const Checkout = () => {
         </BuyButton>
       </HeroSection>
 
-      {/* 3. BANNER (ORIGINAL DESIGN) */}
-      <img src={banner} loading="eager" width="514" sizes="90vw" alt="true" className="image-135"></img>
+      {/* 3. BANNER - OPTIMIZATION 2: Removed eager loading */}
+      <img src={banner} loading="lazy" width="514" sizes="90vw" alt="true" className="image-135"></img>
 
-      {/* 4. ORIGINAL ANIMATED BLOCKS (RESTORED HTML) */}
+      {/* 4. BLOCKS */}
       <section className="section mt">
         <div className="block block2">
             <div className="block31 cardtext" ref={sectionRef}>
@@ -409,7 +446,7 @@ const Checkout = () => {
         </div>
       </section>
 
-      {/* 5. PARALLAX TEXT (RESTORED) */}
+      {/* 5. PARALLAX */}
       <section className="section mt">
           <div className="block">
               <div className="container container34">
@@ -434,7 +471,7 @@ const Checkout = () => {
         <div className="block">
           <div className="block4">
             <div className="container block41" style={{ flexDirection: 'column', alignItems: 'center' }}>
-                <div className="section32 block413 fadeIn2" style={{ marginBottom: 20 }}>
+                <div className="section22 block412 fadeIn2" style={{ marginBottom: 20 }}>
                     <h5 style={{textAlign: 'center'}}>il prossimo evento inizierà in:</h5>
                 </div>
                 
@@ -448,7 +485,7 @@ const Checkout = () => {
                 </div>
             </div>
 
-            {/* GLASS CARD CHECKOUT */}
+            {/* CHECKOUT CARD */}
             <div ref={checkoutRef} style={{ marginTop: 80, display: 'flex', justifyContent: 'center' }}>
                 <CheckoutCard
                     initial={{ scale: 0.9, opacity: 0 }}
@@ -467,8 +504,11 @@ const Checkout = () => {
                             <button onClick={inc}>+</button>
                         </Counter>
 
-                        <DisabledButton>Coming Soon</DisabledButton>
-                        <p style={{ fontSize: 12, opacity: 0.5 }}>Sales are closed for now</p>
+                        <PayButton onClick={handleCheckout} disabled={isLoading}>
+                           {isLoading ? "Processing..." : "Acquista ora"}
+                        </PayButton>
+                        
+                        <p style={{ fontSize: 12, opacity: 0.5 }}>Secure payment via Stripe</p>
                     </PassInfo>
                 </CheckoutCard>
             </div>
