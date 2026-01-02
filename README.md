@@ -27,6 +27,7 @@ Himeros Club is a specialized web application designed for a private membership 
 - npm or yarn
 
 ### Installation
+
 1. Clone the repository:
 ```bash
 git clone [https://github.com/rxxddy/himerosclub.git](https://github.com/rxxddy/himerosclub.git)
