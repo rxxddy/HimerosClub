@@ -390,6 +390,13 @@ a {
   max-width: 34em;
 }
 
+.section32.block413 {
+  font-family: auto;
+  padding-top: 8.24em;
+  top: 0;
+  max-width: 34em;
+}
+
 .section22.container34 {
   position: relative;
   z-index: 2;
@@ -443,6 +450,8 @@ a {
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+  padding-right: 1.15em;
+  padding-left: 1.15em;
 }
 
 .image {
@@ -494,6 +503,7 @@ a {
 .himerosclub-middle-img {
   -o-object-fit: cover;
   object-fit: cover;
+  max-width: 70%;
 }
 
 .himerosclub1 {
@@ -755,6 +765,8 @@ a {
       -webkit-flex-direction: column;
       -ms-flex-direction: column;
       flex-direction: column;
+      padding-right: 1.15em;
+      padding-left: 1.15em;
   }
 
   .x-141 {
