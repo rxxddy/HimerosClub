@@ -69,5 +69,3 @@ npm start
 ## 🛡️ License
 
 This project is proprietary. All rights reserved.
-
-```
