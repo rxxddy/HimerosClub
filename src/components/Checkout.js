@@ -471,7 +471,7 @@ const Checkout = () => {
         <div className="block">
           <div className="block4">
             <div className="container block41" style={{ flexDirection: 'column', alignItems: 'center' }}>
-                <div className="section22 block412 fadeIn2" style={{ marginBottom: 20 }}>
+                <div className="section32 block413 fadeIn2" style={{ marginBottom: 20 }}>
                     <h5 style={{textAlign: 'center'}}>il prossimo evento inizierà in:</h5>
                 </div>
                 
